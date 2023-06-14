@@ -2,5 +2,19 @@
   "name": "seda-locker-websocket",
   "version": "1.0.0",
   "dependencies": {
+    "comcigan-parser": "^1.0.0",
+    "config": "^3.3.9",
+    "node-schedule": "^2.1.1",
+    "ws": "^8.13.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon watch ./"
+  },
+  "devDependencies": {
+    "@types/config": "^3.3.0",
+    "@types/nconf": "^0.10.3",
+    "prettier": "2.8.8",
+    "typescript": "^5.1.3"
   }
 }
