@@ -20,24 +20,20 @@ export interface LockerData {
 
 type SetLockerData = { [Property in keyof LockerData]?: LockerData[Property] }
 export async function getLockerData(uuid: string) {
-    try {
-        const data = (
-            await dynamoDB
-                .get({
-                    TableName: 'seda_locker',
-                    Key: {
-                        uuid,
-                    },
-                })
-                .promise()
-        )?.Item
-        if (data?.uuid && data?.secretKey) {
-            return data as LockerData
-        }
-        throw new Error('No locker data found or invalid locker data')
-    } catch (err) {
-        throw new Error(JSON.stringify(err))
+    const data = (
+        await dynamoDB
+            .get({
+                TableName: 'seda_locker',
+                Key: {
+                    uuid,
+                },
+            })
+            .promise()
+    )?.Item
+    if (data?.uuid && data?.secretKey) {
+        return data as LockerData
     }
+    return new Error('No locker data found or invalid locker data')
 }
 export async function setLockerData(uuid: string, data: SetLockerData) {
     const updateExpression = []
