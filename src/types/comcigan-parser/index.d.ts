@@ -40,15 +40,15 @@ interface TimetableData {
     }
 }
 interface WeekdayData {
-    grade: number
-    class: number
-    weekday: number
-    weekdayString: Weekday
+    grade?: number
+    class?: number
+    weekday?: number
+    weekdayString?: Weekday
     classTime: number
     teacher: string
     subject: string
 }
-type TimetableByWeekday = Array<Array<{}>>
+type TimetableByWeekday = Array<Array<WeekdayData>>
 interface PeriodData {
     start: {
         hour: number
@@ -60,5 +60,6 @@ interface PeriodData {
     }
     duration: number
 }
+
 type Weekday = ['일', '월', '화', '수', '목', '금', '토']
 type ClassTimeData = Array<string>
