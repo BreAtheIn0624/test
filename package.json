@@ -2,5 +2,29 @@
   "name": "seda-locker-websocket",
   "version": "1.0.0",
   "dependencies": {
+    "@types/aws-sdk": "^2.7.0",
+    "@types/crypto-js": "^4.1.1",
+    "@types/express": "^4.17.17",
+    "@types/express-ws": "^3.0.1",
+    "@types/node": "^20.4.1",
+    "@types/ws": "^8.5.5",
+    "aws-sdk": "^2.1414.0",
+    "comcigan-parser": "^1.0.0",
+    "config": "^3.3.9",
+    "crypto-js": "^4.1.1",
+    "express": "^4.18.2",
+    "express-ws": "^5.0.2",
+    "node-schedule": "^2.1.1",
+    "ws": "^8.13.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon watch ./"
+  },
+  "devDependencies": {
+    "@types/config": "^3.3.0",
+    "@types/nconf": "^0.10.3",
+    "prettier": "2.8.8",
+    "typescript": "^5.1.3"
   }
 }
