@@ -1,13 +1,14 @@
-// @ts-ignorenn
 import Timetable = require('comcigan-parser')
 import config from 'config'
 export default class extends Timetable {
-    classDuration = [45, 50]
-    _schoolName: string = ''
+    _classDuration: Array<number> = [45, 50]
+    _schoolName: string
+    _mobileClass: Set<string>
     constructor() {
         super()
         this._initialized = false
         this._schoolName = config.get('school.name')
+        this._mobileClass = new Set(config.get('mobileClass'))
     }
     async getClassTimetable(grade: number, classNumber: number, weekDay: Array<number>): Promise<TimetableByWeekday> {
         if (!this._initialized) await this._reset()
@@ -33,7 +34,7 @@ export default class extends Timetable {
         const period = (await super.getClassTime())[periods - 1]
         const [hours, minutes] = period.split(/(\(|\))/)[2].split(':')
         const endTime = new Date()
-        const duration = this._schoolName.search('고등학교') === -1 ? this.classDuration[0] : this.classDuration[1]
+        const duration = this._schoolName.search('고등학교') === -1 ? this._classDuration[0] : this._classDuration[1]
         endTime.setHours(Number(hours))
         endTime.setMinutes(Number(minutes) + duration)
         return {
@@ -47,6 +48,13 @@ export default class extends Timetable {
             },
             duration,
         }
+    }
+    async getMobileClass(grade: number, classNumber: number, weekDay: number) {
+        const [timetable] = await this.getClassTimetable(grade, classNumber, [weekDay])
+        if (timetable === undefined) return []
+        return timetable.filter((item: WeekdayData) => {
+            if (this._mobileClass.has(item.subject)) return true
+        })
     }
     async _reset() {
         const option: InitOption = {
