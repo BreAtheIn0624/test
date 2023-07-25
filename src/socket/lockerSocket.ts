@@ -1,4 +1,3 @@
-import { Application, Express } from 'express'
 import expressWs from 'express-ws'
 import { getLockerData, setLockerData } from '../api/LockerDB'
 import Crypto from 'crypto-js'
@@ -46,6 +45,7 @@ export default function (app: expressWs.Application) {
                         }
                         await setLockerData(lockerData.uuid, { auth_key: encrypt })
                         ws.send(JSON.stringify(wsMessage))
+                        return
                     case lockerSocketMessageType.CONNECTION_AUTH_RESPONSE:
                         const decrypt = Crypto.AES.decrypt(res.data?.auth_key, lockerData.secretKey).toString(
                             Crypto.enc.Utf8,
@@ -66,10 +66,13 @@ export default function (app: expressWs.Application) {
                             ws.send(JSON.stringify(wsMessage))
                             ws.close()
                         }
+                        return
                     case lockerSocketMessageType.LOCKER_OPEN_SUCCESS:
                         await setLockerData(lockerData.uuid, { isLocked: false })
+                        return
                     case lockerSocketMessageType.LOCKER_CLOSE_SUCCESS:
                         await setLockerData(lockerData.uuid, { isLocked: true })
+                        return
                     case lockerSocketMessageType.LOCKER_CLOSE_FAILED:
                         await setLockerData(lockerData.uuid, { isLocked: false })
                         if (res.data?.attempt <= 2) {
@@ -83,6 +86,7 @@ export default function (app: expressWs.Application) {
                         } else {
                             await setLockerData(lockerData.uuid, { isLocked: false })
                         }
+                        return
                 }
             } catch (error) {
                 wsMessage = {
