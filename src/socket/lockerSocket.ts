@@ -1,14 +1,15 @@
+import { Application, Express } from 'express'
 import expressWs from 'express-ws'
 import { getLockerData, setLockerData } from '../api/LockerDB'
 import Crypto from 'crypto-js'
 
 export enum lockerSocketMessageType {
     CONNECTION_INIT = 'CONNECTION_INIT',
-    CONNECTION_REQUEST = 'CONNECTION_REQUEST',
-    CONNECTION_AUTH_INIT = 'CONNECTION_AUTH_INIT',
-    CONNECTION_AUTH_RESPONSE = 'CONNECTION_AUTH_RESPONSE',
+    //CONNECTION_REQUEST = 'CONNECTION_REQUEST',
+    //CONNECTION_AUTH_INIT = 'CONNECTION_AUTH_INIT',
+    //CONNECTION_AUTH_RESPONSE = 'CONNECTION_AUTH_RESPONSE',
     CONNECTION_FAILED = 'CONNECTION_FAILED',
-    CONNECTION_SUCCESS = 'CONNECTION_SUCCESS',
+    //CONNECTION_SUCCESS = 'CONNECTION_SUCCESS',
     LOCKER_OPEN = 'LOCKER_OPEN',
     LOCKER_CLOSE = 'LOCKER_CLOSE',
     LOCKER_OPEN_SUCCESS = 'LOCKER_OPEN_SUCCESS',
@@ -34,7 +35,7 @@ export default function (app: expressWs.Application) {
                 const uuid = res.data?.uuid
                 const lockerData = await getLockerData(uuid)
                 switch (res.type) {
-                    case lockerSocketMessageType.CONNECTION_REQUEST:
+                    /* case lockerSocketMessageType.CONNECTION_REQUEST:
                         const rand = Crypto.lib.WordArray.random(16).toString()
                         const encrypt = Crypto.AES.encrypt(rand, res.data?.secretKey).toString()
                         wsMessage = {
@@ -66,7 +67,7 @@ export default function (app: expressWs.Application) {
                             ws.send(JSON.stringify(wsMessage))
                             ws.close()
                         }
-                        return
+                        return*/
                     case lockerSocketMessageType.LOCKER_OPEN_SUCCESS:
                         await setLockerData(lockerData.uuid, { isLocked: false })
                         return
@@ -93,6 +94,7 @@ export default function (app: expressWs.Application) {
                     type: lockerSocketMessageType.CONNECTION_FAILED,
                 }
                 ws.send(JSON.stringify(wsMessage))
+                console.error(error)
             }
         })
     })
