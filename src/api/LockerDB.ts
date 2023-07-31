@@ -33,7 +33,7 @@ export async function getLockerData(uuid: string) {
     if (data?.uuid && data?.secretKey) {
         return data as LockerData
     }
-    return new Error('No locker data found or invalid locker data')
+    throw new Error('No locker data found or invalid locker data')
 }
 export async function setLockerData(uuid: string, data: SetLockerData) {
     const updateExpression = []
