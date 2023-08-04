@@ -62,8 +62,8 @@ app.put('/api/orderLocker/:uuid', async (req, res) => {
             } else {
                 res.status(400).json({ error: 'locker is already open' })
                 res.end()
-                return
             }
+            return
         case 'close':
             if (!locker.isLocked) {
                 const response = {
@@ -77,6 +77,7 @@ app.put('/api/orderLocker/:uuid', async (req, res) => {
                 res.end()
                 return
             }
+            return
     }
 })
 
