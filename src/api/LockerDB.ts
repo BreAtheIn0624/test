@@ -1,4 +1,3 @@
-import { AWSError } from 'aws-sdk'
 import AWS = require('aws-sdk')
 AWS.config.getCredentials(function (err) {
     if (err) console.log(err.stack)

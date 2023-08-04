@@ -1,4 +1,4 @@
-import { getLockerData, setLockerData } from './api/LockerDB'
+import { setLockerData } from './api/LockerDB'
 import { WebSocket } from 'ws'
 import { Server } from 'http'
 import { lockerClient } from './index'
