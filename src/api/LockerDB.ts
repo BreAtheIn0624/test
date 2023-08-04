@@ -7,15 +7,13 @@ AWS.config.update({ region: 'ap-northeast-2' })
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 
+export const lockerDataProperties = ['uuid', 'nickname', 'isLocked', 'grade', 'classNumber']
 export interface LockerData {
     uuid: string
-    secretKey: string
-    auth_key: string
     nickname: string | null
-    isRegistered: boolean
-    isAwaken: boolean
     isLocked: boolean
-    isClosed: boolean
+    grade: number
+    classNumber: number
 }
 
 type SetLockerData = { [Property in keyof LockerData]?: LockerData[Property] }
@@ -30,11 +28,26 @@ export async function getLockerData(uuid: string) {
             })
             .promise()
     )?.Item
-    if (data?.uuid && data?.secretKey) {
+    if (data?.uuid) {
         return data as LockerData
     }
-    throw new Error('No locker data found or invalid locker data')
+    return null
 }
+
+export async function scanLockerData() {
+    const data = (
+        await dynamoDB
+            .scan({
+                TableName: 'seda_locker',
+            })
+            .promise()
+    )?.Items
+    if (data) {
+        return data as LockerData[]
+    }
+    return []
+}
+
 export async function setLockerData(uuid: string, data: SetLockerData) {
     const updateExpression = []
     const updateAttributeValues: { [key: string]: any } = {}
@@ -52,11 +65,11 @@ export async function setLockerData(uuid: string, data: SetLockerData) {
         UpdateExpression: 'set ' + updateExpression.join(', '),
         ExpressionAttributeValues: updateAttributeValues,
     }
-    dynamoDB.update(params, function (err: AWSError, data: AWS.DynamoDB.DocumentClient.UpdateItemOutput) {
-        if (err) {
-            throw new Error('Unable to update item. Error JSON:')
-        } else {
-            console.log('UpdateItem succeeded:', JSON.stringify(data, null, 2))
-        }
-    })
+    try {
+        await dynamoDB.update(params).promise()
+        return true
+    } catch (e) {
+        console.error(e)
+        return false
+    }
 }
