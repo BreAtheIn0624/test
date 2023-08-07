@@ -1,7 +1,7 @@
-import { setLockerData } from './api/LockerDB'
+import { getLockerData, LockerData, setLockerData } from './api/LockerDB'
 import { WebSocket } from 'ws'
 import { Server } from 'http'
-import { lockerClient } from './index'
+import { lockerClient, timeTable } from './index'
 
 export enum lockerSocketMessageType {
     CONNECTION_INIT = 'CONNECTION_INIT',
@@ -11,6 +11,11 @@ export enum lockerSocketMessageType {
     LOCKER_OPEN_SUCCESS = 'LOCKER_OPEN_SUCCESS',
     LOCKER_CLOSE_SUCCESS = 'LOCKER_CLOSE_SUCCESS',
     LOCKER_CLOSE_FAILED = 'LOCKER_CLOSE_FAILED',
+    REQ_MOBILE_CLASS = 'REQ_MOBILE_CLASS',
+    RES_MOBILE_CLASS = 'RES_MOBILE_CLASS',
+    REQ_TIMEPERIOD = 'REQ_TIMEPERIOD',
+    RES_TIMEPERIOD = 'RES_TIMEPERIOD',
+    REQ_SYNC = 'REQ_SYNC',
 }
 export interface lockerSocketMessage {
     type: lockerSocketMessageType
@@ -20,7 +25,9 @@ export function initSocket(app: Server) {
     const wss = new WebSocket.Server({ server: app })
     wss.on('connection', function connection(ws) {
         ws.on('error', console.error)
-        ws.on('open', function open() {})
+        ws.on('open', function open() {
+            console.log(1)
+        })
         ws.on('close', () => {
             lockerClient.forEach((value, key) => {
                 if (value === ws) lockerClient.delete(key)
@@ -66,6 +73,30 @@ export function initSocket(app: Server) {
                             await setLockerData(uuid, { isLocked: false })
                         }
                         return
+                    case lockerSocketMessageType.REQ_MOBILE_CLASS || lockerSocketMessageType.REQ_TIMEPERIOD:
+                        let { grade, classNumber } = (await getLockerData(uuid)) as LockerData
+                        const weekday = new Date().getDay() - 1
+                        if (res.type === lockerSocketMessageType.REQ_MOBILE_CLASS) {
+                            const timetable = await timeTable.getMobileClass(grade, classNumber, weekday)
+                            wsMessage = {
+                                type: lockerSocketMessageType.RES_MOBILE_CLASS,
+                                data: {
+                                    mobileClass: timetable,
+                                },
+                            }
+                            ws.send(JSON.stringify(wsMessage))
+                            return
+                        } else {
+                            const period = await timeTable.getPeriods(res.data?.period)
+                            wsMessage = {
+                                type: lockerSocketMessageType.RES_TIMEPERIOD,
+                                data: {
+                                    period: period,
+                                },
+                            }
+                            ws.send(JSON.stringify(wsMessage))
+                            return
+                        }
                 }
             } catch (error) {
                 wsMessage = {
