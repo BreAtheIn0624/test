@@ -16,6 +16,7 @@ export enum lockerSocketMessageType {
     REQ_TIMEPERIOD = 'REQ_TIMEPERIOD',
     RES_TIMEPERIOD = 'RES_TIMEPERIOD',
     REQ_SYNC = 'REQ_SYNC',
+    RES_SYNC = 'RES_SYNC',
 }
 export interface lockerSocketMessage {
     type: lockerSocketMessageType
@@ -52,6 +53,10 @@ export function initSocket(app: Server) {
                             }
                         }
                         lockerClient.set(uuid, ws)
+                        wsMessage = {
+                            type: lockerSocketMessageType.REQ_SYNC
+                        }
+                        ws.send(JSON.stringify(wsMessage))
                         return
                     case lockerSocketMessageType.LOCKER_OPEN_SUCCESS:
                         await setLockerData(uuid, { isLocked: false })
@@ -69,10 +74,8 @@ export function initSocket(app: Server) {
                                 },
                             }
                             ws.send(JSON.stringify(wsMessage))
-                        } else {
-                            await setLockerData(uuid, { isLocked: false })
                         }
-                        return
+                        return;
                     case lockerSocketMessageType.REQ_MOBILE_CLASS || lockerSocketMessageType.REQ_TIMEPERIOD:
                         let { grade, classNumber } = (await getLockerData(uuid)) as LockerData
                         const weekday = new Date().getDay() - 1
@@ -97,6 +100,11 @@ export function initSocket(app: Server) {
                             ws.send(JSON.stringify(wsMessage))
                             return
                         }
+                    case lockerSocketMessageType.RES_SYNC:
+                        let now = Date.now()
+                        await setLockerData(uuid, { lastSync: now });
+                        return;
+                            
                 }
             } catch (error) {
                 wsMessage = {
