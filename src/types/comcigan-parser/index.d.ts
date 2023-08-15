@@ -50,14 +50,8 @@ interface WeekdayData {
 }
 type TimetableByWeekday = Array<Array<WeekdayData>>
 interface PeriodData {
-    start: {
-        hour: number
-        minute: number
-    }
-    end: {
-        hour: number
-        minute: number
-    }
+    start: number
+    end: number
     duration: number
 }
 
