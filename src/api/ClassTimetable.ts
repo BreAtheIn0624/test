@@ -33,19 +33,16 @@ export default class extends Timetable {
         if (!this._initialized) await this._reset()
         const period = (await super.getClassTime())[periods - 1]
         const [hours, minutes] = period.split(/(\(|\))/)[2].split(':')
-        const endTime = new Date()
         const duration = this._schoolName.search('고등학교') === -1 ? this._classDuration[0] : this._classDuration[1]
-        endTime.setHours(Number(hours))
-        endTime.setMinutes(Number(minutes) + duration)
+        const startTime = new Date()
+        startTime.setHours(Number(hours))
+        startTime.setMinutes(Number(minutes))
+        startTime.setSeconds(0)
+        startTime.setMilliseconds(0)
+        const endTime = Date.parse(startTime.toString()) + duration * 60 * 1000
         return {
-            start: {
-                hour: Number(hours),
-                minute: Number(minutes),
-            },
-            end: {
-                hour: endTime.getHours(),
-                minute: endTime.getMinutes(),
-            },
+            start: startTime.getTime(),
+            end: endTime,
             duration,
         }
     }

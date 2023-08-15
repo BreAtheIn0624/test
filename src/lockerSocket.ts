@@ -54,7 +54,7 @@ export function initSocket(app: Server) {
                         }
                         lockerClient.set(uuid, ws)
                         wsMessage = {
-                            type: lockerSocketMessageType.REQ_SYNC
+                            type: lockerSocketMessageType.REQ_SYNC,
                         }
                         ws.send(JSON.stringify(wsMessage))
                         return
@@ -75,7 +75,7 @@ export function initSocket(app: Server) {
                             }
                             ws.send(JSON.stringify(wsMessage))
                         }
-                        return;
+                        return
                     case lockerSocketMessageType.REQ_MOBILE_CLASS || lockerSocketMessageType.REQ_TIMEPERIOD:
                         let { grade, classNumber } = (await getLockerData(uuid)) as LockerData
                         const weekday = new Date().getDay() - 1
@@ -94,7 +94,12 @@ export function initSocket(app: Server) {
                             wsMessage = {
                                 type: lockerSocketMessageType.RES_TIMEPERIOD,
                                 data: {
-                                    period: period,
+                                    period: {
+                                        period: res.data?.period,
+                                        start: period.start,
+                                        end: period.end,
+                                        duration: period.duration,
+                                    },
                                 },
                             }
                             ws.send(JSON.stringify(wsMessage))
@@ -102,9 +107,8 @@ export function initSocket(app: Server) {
                         }
                     case lockerSocketMessageType.RES_SYNC:
                         let now = Date.now()
-                        await setLockerData(uuid, { lastSync: now });
-                        return;
-                            
+                        await setLockerData(uuid, { lastSync: now })
+                        return
                 }
             } catch (error) {
                 wsMessage = {
