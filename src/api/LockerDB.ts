@@ -6,7 +6,7 @@ AWS.config.update({ region: 'ap-northeast-2' })
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 
-export const lockerDataProperties = ['uuid', 'nickname', 'isLocked', 'grade', 'classNumber', 'lastSync']
+export const lockerDataProperties = ['uuid', 'nickname', 'isLocked', 'grade', 'classNumber', 'lastSync', 'onSchedule']
 export interface LockerData {
     uuid: string
     nickname: string | null
@@ -14,6 +14,7 @@ export interface LockerData {
     grade: number
     classNumber: number
     lastSync: number
+    onSchedule: boolean
 }
 
 type SetLockerData = { [Property in keyof LockerData]?: LockerData[Property] }

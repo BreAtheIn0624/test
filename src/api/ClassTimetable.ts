@@ -50,8 +50,11 @@ export default class extends Timetable {
         const [timetable] = await this.getClassTimetable(grade, classNumber, [weekDay])
         if (timetable === undefined) return []
         return timetable.filter((item: WeekdayData) => {
-            if (this._mobileClass.has(item.subject)) return true
+            if (this.isMobileClass(item.subject)) return true
         })
+    }
+    isMobileClass(subject: string) {
+        return this._mobileClass.has(subject)
     }
     async _reset() {
         const option: InitOption = {
