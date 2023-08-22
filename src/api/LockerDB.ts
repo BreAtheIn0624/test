@@ -19,6 +19,7 @@ export interface LockerData {
 
 type SetLockerData = { [Property in keyof LockerData]?: LockerData[Property] }
 export async function getLockerData(uuid: string) {
+    console.time('getLockerData()')
     const data = (
         await dynamoDB
             .get({
@@ -30,8 +31,10 @@ export async function getLockerData(uuid: string) {
             .promise()
     )?.Item
     if (data?.uuid) {
+        console.timeEnd('getLockerData()')
         return data as LockerData
     }
+    console.timeEnd('getLockerData()')
     return null
 }
 

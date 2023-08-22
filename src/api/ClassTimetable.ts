@@ -4,11 +4,13 @@ export default class extends Timetable {
     _classDuration: Array<number> = [45, 50]
     _schoolName: string
     _mobileClass: Set<string>
-    constructor() {
+    _cacheDuration: number
+    constructor(cache?: number) {
         super()
         this._initialized = false
         this._schoolName = config.get('school.name')
         this._mobileClass = new Set(config.get('mobileClass'))
+        this._cacheDuration = cache || 0
     }
     async getClassTimetable(grade: number, classNumber: number, weekDay: Array<number>): Promise<TimetableByWeekday> {
         if (!this._initialized) await this._reset()
@@ -59,6 +61,7 @@ export default class extends Timetable {
     async _reset() {
         const option: InitOption = {
             maxGrade: (config.get('school.highestGrade') as number) || 3,
+            cache: this._cacheDuration,
         }
         await this.init(option)
         this.setSchool(config.get('school.code'))
