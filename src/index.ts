@@ -11,26 +11,24 @@ const app = express()
 const server = createServer(app)
 const wss = initSocket(server)
 const lockerClient = new Map<string, WebSocket>()
-const timeTable = new Timetable()
+const timeTable = new Timetable(3600000)
 
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(cors())
-app.use((req, res, next) => {
-    console.log(lockerClient.keys())
-    next()
-})
 
 app.use('/api/:resource/:uuid', async (req, res, next) => {
+    console.time('vaildation')
     const uuid = req.params.uuid
     const locker = await getLockerData(uuid)
-    //detect 'locker' has only and every property of LockerData using lockerDataProperties
     if (locker && Object.keys(locker).every((key) => lockerDataProperties.includes(key))) {
         next()
+        console.timeEnd('vaildation')
         return
     }
     res.status(400).json({ error: 'invalid locker' })
     res.end()
+    console.timeEnd('vaildation')
 })
 
 app.get('/api/lockerState', async (req, res) => {
@@ -86,7 +84,7 @@ app.put('/api/orderLocker/:uuid', async (req, res) => {
             return
         case 'onSchedule':
             response = {
-                type: lockerSocketMessageType.LOCKER_OFF_SCHEDULE,
+                type: lockerSocketMessageType.LOCKER_ON_SCHEDULE,
             }
             ws.send(JSON.stringify(response))
             response = {
