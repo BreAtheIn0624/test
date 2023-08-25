@@ -39,8 +39,10 @@ export function initSocket(app: Server) {
         })
         ws.on('message', async (data) => {
             let wsMessage: lockerSocketMessage
+
             try {
                 const res = JSON.parse(data.toString()) as lockerSocketMessage
+                console.log(JSON.stringify(res))
                 const uuid = res.data?.uuid
                 switch (res.type) {
                     case lockerSocketMessageType.CONNECTION_INIT:
