@@ -39,11 +39,13 @@ function initSocket(app) {
             console.log(1);
         });
         ws.on('close', () => {
-            index_1.lockerClient.forEach((value, key) => {
-                if (value === ws)
+            index_1.lockerClient.forEach((value, key) => __awaiter(this, void 0, void 0, function* () {
+                if (value === ws) {
                     index_1.lockerClient.delete(key);
+                    yield (0, LockerDB_1.setLockerData)(key, { isLocked: false });
+                }
                 return;
-            });
+            }));
         });
         ws.on('message', (data) => __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c, _d, _e, _f, _g;
@@ -69,6 +71,7 @@ function initSocket(app) {
                             type: lockerSocketMessageType.REQ_SYNC,
                         };
                         ws.send(JSON.stringify(wsMessage));
+                        yield (0, LockerDB_1.setLockerData)(uuid, { isLocked: false });
                         return;
                     case lockerSocketMessageType.LOCKER_OPEN_SUCCESS:
                         yield (0, LockerDB_1.setLockerData)(uuid, { isLocked: false });
