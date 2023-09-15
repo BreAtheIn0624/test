@@ -32,8 +32,11 @@ export function initSocket(app: Server) {
             console.log(1)
         })
         ws.on('close', () => {
-            lockerClient.forEach((value, key) => {
-                if (value === ws) lockerClient.delete(key)
+            lockerClient.forEach(async (value, key) => {
+                if (value === ws) {
+                    lockerClient.delete(key)
+                    await setLockerData(key, { isLocked: false })
+                }
                 return
             })
         })
@@ -61,6 +64,7 @@ export function initSocket(app: Server) {
                             type: lockerSocketMessageType.REQ_SYNC,
                         }
                         ws.send(JSON.stringify(wsMessage))
+                        await setLockerData(uuid, { isLocked: false })
                         return
                     case lockerSocketMessageType.LOCKER_OPEN_SUCCESS:
                         await setLockerData(uuid, { isLocked: false })
