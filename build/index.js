@@ -69,33 +69,20 @@ app.put('/api/orderLocker/:uuid', (req, res) => __awaiter(void 0, void 0, void 0
     let response;
     switch (task) {
         case 'open':
-            if (locker.isLocked) {
-                response = {
-                    type: lockerSocket_1.lockerSocketMessageType.LOCKER_OPEN,
-                };
-                ws.send(JSON.stringify(response));
-                res.status(200).json({ message: 'ordered success' });
-                res.end();
-            }
-            else {
-                res.status(400).json({ error: 'locker is already open' });
-                res.end();
-            }
+            response = {
+                type: lockerSocket_1.lockerSocketMessageType.LOCKER_OPEN,
+            };
+            ws.send(JSON.stringify(response));
+            res.status(200).json({ message: 'ordered success' });
+            res.end();
             return;
         case 'close':
-            if (!locker.isLocked) {
-                response = {
-                    type: lockerSocket_1.lockerSocketMessageType.LOCKER_CLOSE,
-                };
-                ws.send(JSON.stringify(response));
-                res.status(200).json({ message: 'ordered success' });
-                res.end();
-            }
-            else {
-                res.status(400).json({ error: 'locker is already closed' });
-                res.end();
-                return;
-            }
+            response = {
+                type: lockerSocket_1.lockerSocketMessageType.LOCKER_CLOSE,
+            };
+            ws.send(JSON.stringify(response));
+            res.status(200).json({ message: 'ordered success' });
+            res.end();
             return;
         case 'onSchedule':
             response = {
